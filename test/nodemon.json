@@ -1,0 +1,6 @@
+{
+  "watch": ["test"],
+  "ext": "test.js",
+  "ignore": [],
+  "exec": "npm test"
+}

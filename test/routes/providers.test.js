@@ -41,6 +41,9 @@ describe('routes providers', () => {
     database.memory()
     database.clear()
   })
+  after(() => {
+    database.clear()
+  })
 
   describe('PUT /routing/v1/providers/', () => {
     it('should return status 200', async () => {
@@ -64,6 +67,20 @@ describe('routes providers', () => {
    it('database should have provider', async () => {
       const providers = await database.getProviders(body.Providers[0].Payload.Keys[0])
       expect(providers.length).to.equal(1)
+    })
+  })
+
+  describe('GET /routing/v1/providers/', () => {
+    it('should return status 200', async () => {
+      const res = await request(app)
+        .get(`/routing/v1/providers/${body.Providers[0].Payload.Keys[0]}`)
+        .set(headers)
+
+      expect(res.status).to.equal(200)
+      expect(res.body.Providers[0].Schema).to.equal('peer')
+      expect(res.body.Providers[0].ID).to.equal(body.Providers[0].Payload.ID)
+      expect(res.body.Providers[0].Protocols[0]).to.equal(body.Providers[0].Protocol)
+      expect(res.body.Providers[0].Addrs).to.deep.equal(body.Providers[0].Payload.Addrs)
     })
   })
 })

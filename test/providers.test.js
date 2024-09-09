@@ -1,3 +1,4 @@
+import database from '../lib/database.js'
 import request from 'supertest'
 import { expect } from 'chai'
 import app from '../app.js'
@@ -36,8 +37,12 @@ const body = {
 }
 
 describe('/routing/v1/providers/', () => {
+  before(() => {
+    database.memory()
+  })
+
   describe('PUT', () => {
-    it('should return status 200"', async () => {
+    it('should return status 200', async () => {
       const res = await request(app)
         .put('/routing/v1/providers/')
         .set(headers)
@@ -53,6 +58,12 @@ describe('/routing/v1/providers/', () => {
           }
         ]
       })
+    })
+
+   it('database should have provider', async () => {
+      const providers = await database.getProviders()
+      expect(providers.length).to.equal(1)
+      console.log({providers})
     })
   })
 })

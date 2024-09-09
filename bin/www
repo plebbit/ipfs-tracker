@@ -5,9 +5,9 @@
  */
 
 import app from '../app.js'
-import debugLib from 'debug'
 import http from 'http'
-const debug = debugLib('ipfs-tracker:server')
+import Debug from 'debug'
+const debug = Debug('ipfs-tracker:server')
 
 /**
  * Get port from environment and store in Express.

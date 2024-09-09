@@ -1,7 +1,7 @@
-import database from '../lib/database.js'
+import database from '../../lib/database.js'
 import request from 'supertest'
 import { expect } from 'chai'
-import app from '../app.js'
+import app from '../../app.js'
 
 const headers ={
   'user-agent': 'kubo/0.29.0/',
@@ -36,12 +36,13 @@ const body = {
   ]
 }
 
-describe('/routing/v1/providers/', () => {
+describe('routes providers', () => {
   before(() => {
     database.memory()
+    database.clear()
   })
 
-  describe('PUT', () => {
+  describe('PUT /routing/v1/providers/', () => {
     it('should return status 200', async () => {
       const res = await request(app)
         .put('/routing/v1/providers/')
@@ -61,9 +62,8 @@ describe('/routing/v1/providers/', () => {
     })
 
    it('database should have provider', async () => {
-      const providers = await database.getProviders()
+      const providers = await database.getProviders(body.Providers[0].Payload.Keys[0])
       expect(providers.length).to.equal(1)
-      console.log({providers})
     })
   })
 })

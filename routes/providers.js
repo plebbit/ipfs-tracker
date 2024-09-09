@@ -3,8 +3,8 @@ import express from 'express'
 const router = express.Router()
 
 router.put('/', async (req, res, next) => {
-  console.log(req.headers)
-  console.log(req.body)
+  // console.log(req.headers)
+  // console.log(req.body)
 
   await database.addProviders(req.body.Providers)
 
@@ -23,7 +23,7 @@ router.get('/:cid', async (req, res, next) => {
   console.log(req.headers)
   console.log(req.params)
 
-  const Providers = await database.getProviders(rreq.params.cid)
+  const Providers = await database.getProviders(req.params.cid)
 
   const resBody = {Providers}
   res.send(resBody)

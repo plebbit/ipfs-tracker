@@ -3,6 +3,13 @@ import express from 'express'
 const router = express.Router()
 
 router.put('/', async (req, res, next) => {
+  // TODO: don't let people add ip addresses that aren't theirs
+  /* TODO: once the POST spec is finalized, add interval and min interval to response, and remove peers after this time
+    The Pirate Bay: Often uses an announce interval of 1800 seconds (30 minutes).
+    1337x: May use similar intervals like 1800 seconds, with a minimum announce interval of around 300 seconds.
+    Rutracker: Frequently employs announce intervals of 1800 seconds, and minimum intervals of around 300-600 seconds.
+  */
+
   await database.addProviders(req.body.Providers)
 
   const resBody = {ProvideResults: []}

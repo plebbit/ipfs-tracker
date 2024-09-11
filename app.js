@@ -18,6 +18,9 @@ app.use((req, res, next) => {
   next()
 })
 
+// trust x-forwarded-for, the app will almost always use a proxu
+app.set('trust proxy', true)
+
 app.use(logger('dev'))
 app.use(express.json({limit: '1mb'}))
 // app.use(express.urlencoded({ extended: false }))

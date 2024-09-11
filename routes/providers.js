@@ -1,16 +1,26 @@
 import database from '../lib/database.js'
+import {cleanAddrs} from '../lib/utils.js'
 import express from 'express'
 const router = express.Router()
 
 router.put('/', async (req, res, next) => {
-  // TODO: don't let people add ip addresses that aren't theirs
+  // TODO: don't let people add ip addresses that aren't theirs, or peers without any Addrs, or private ips Addrs
   /* TODO: once the POST spec is finalized, add interval and min interval to response, and remove peers after this time
     The Pirate Bay: Often uses an announce interval of 1800 seconds (30 minutes).
     1337x: May use similar intervals like 1800 seconds, with a minimum announce interval of around 300 seconds.
     Rutracker: Frequently employs announce intervals of 1800 seconds, and minimum intervals of around 300-600 seconds.
   */
 
-  await database.addProviders(req.body.Providers)
+  // validate ip before adding to db
+  const providers = req.body.Providers
+  // for (const provider of req.body.Providers) {
+  //   // provider.Payload.Addrs = cleanAddrs(provider.Payload.Addrs, '123.123.123.123')
+  //   if (provider.Payload.Addrs.length) {
+  //     providers.push(provider)
+  //   }
+  // }
+
+  await database.addProviders(providers)
 
   const resBody = {ProvideResults: []}
   for (const Provider of req.body.Providers) {

@@ -4,6 +4,11 @@ import express from 'express'
 const router = express.Router()
 
 router.put('/', async (req, res, next) => {
+  console.log(req.url)
+  console.log(req.headers)
+  console.log({body: req.body})
+  console.log(req.ip)
+
   // TODO: don't let people add ip addresses that aren't theirs, or peers without any Addrs, or private ips Addrs
   /* TODO: once the POST spec is finalized, add interval and min interval to response, and remove peers after this time
     The Pirate Bay: Often uses an announce interval of 1800 seconds (30 minutes).
@@ -14,7 +19,7 @@ router.put('/', async (req, res, next) => {
   // validate ip before adding to db
   const providers = []
   for (const provider of req.body.Providers) {
-    // provider.Payload.Addrs = cleanAddrs(provider.Payload.Addrs, '0.0.0.0')
+    provider.Payload.Addrs = cleanAddrs(provider.Payload.Addrs, req.ip)
     if (provider.Payload.Addrs.length) {
       providers.push(provider)
     }

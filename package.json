@@ -9,7 +9,7 @@
     "test": "mocha ./test/**/*",
     "test:watch": "mocha --parallel --watch ./test/**/*",
     "test:watch:only": "mocha --parallel --watch",
-    "test:nodemon:watch": "nodemon --config ./test/nodemon.json"
+    "test:nodemon": "nodemon --config ./test/nodemon.json"
   },
   "dependencies": {
     "@keyv/compress-gzip": "2.0.2",

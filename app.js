@@ -22,7 +22,11 @@ app.use((req, res, next) => {
 app.set('trust proxy', true)
 
 app.use(logger('dev'))
-app.use(express.json({limit: '1mb'}))
+app.use(express.json({
+  limit: '1mb',
+  // TODO: kubo doesn't always include content-type header, remove after delegated routing spec
+  type: (req) => req.method === 'POST' || req.method === 'PUT'
+}))
 // app.use(express.urlencoded({ extended: false }))
 // app.use(cookieParser())
 // app.use(express.static(path.join(__dirname, 'public')))

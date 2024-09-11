@@ -12,13 +12,13 @@ router.put('/', async (req, res, next) => {
   */
 
   // validate ip before adding to db
-  const providers = req.body.Providers
-  // for (const provider of req.body.Providers) {
-  //   // provider.Payload.Addrs = cleanAddrs(provider.Payload.Addrs, '123.123.123.123')
-  //   if (provider.Payload.Addrs.length) {
-  //     providers.push(provider)
-  //   }
-  // }
+  const providers = []
+  for (const provider of req.body.Providers) {
+    // provider.Payload.Addrs = cleanAddrs(provider.Payload.Addrs, '0.0.0.0')
+    if (provider.Payload.Addrs.length) {
+      providers.push(provider)
+    }
+  }
 
   await database.addProviders(providers)
 

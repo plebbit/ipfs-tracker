@@ -14,6 +14,6 @@ docker run \
   --log-opt max-size=10m \
   --log-opt max-file=5 \
   --publish 80:80 \
-  node:18 sh -c "npm ci && npm start"
+  node:18 sh -c "NO_IP_VALIDATE=1 npm ci && npm start"
 
 docker logs --follow ipfs-tracker

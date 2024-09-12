@@ -120,7 +120,27 @@ describe('routes providers', () => {
     })
   })
 
-  // TODO: no addrs doesnt add the provider
+  describe('PUT /routing/v1/providers/ with no addresses', () => {
+    let res
+    const bodyWithNoAddresses = JSON.parse(JSON.stringify(body))
+    bodyWithNoAddresses.Providers[0].Payload.Addrs = []
+    before(async () => {
+      res = await request(app)
+        .put('/routing/v1/providers/')
+        .set(getHeaders(bodyWithNoAddresses))
+        .send(bodyWithNoAddresses)
+    })
+    after(() => {
+      database.clear()
+    })
+    it('should return status 200', async () => {
+      expect(res.status).to.equal(200)
+    })
+    it('database should not have provider', async () => {
+      const {providers} = await database.getProviders(body.Providers[0].Payload.Keys[0])
+      expect(providers.length).to.equal(0)
+    })
+  })
 
   describe('GET /routing/v1/providers/ has providers', () => {
     let res

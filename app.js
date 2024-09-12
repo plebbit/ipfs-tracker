@@ -9,6 +9,8 @@ import indexRouter from './routes/index.js'
 import providersRouter from './routes/providers.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import cors from 'cors'
+import Debug from 'debug'
+const debug = Debug('ipfs-tracker:server')
 
 const app = express()
 
@@ -22,7 +24,9 @@ app.use((req, res, next) => {
 app.set('trust proxy', true)
 
 app.use(cors())
-app.use(logger('dev'))
+if (debug.enabled) {
+  app.use(logger('dev'))
+}
 app.use(express.json({
   limit: '1mb',
   // TODO: kubo doesn't always include content-type header, remove after delegated routing spec

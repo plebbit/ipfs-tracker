@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import indexRouter from './routes/index.js'
 import providersRouter from './routes/providers.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import cors from 'cors'
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 // trust x-forwarded-for, the app will almost always use a proxu
 app.set('trust proxy', true)
 
+app.use(cors())
 app.use(logger('dev'))
 app.use(express.json({
   limit: '1mb',

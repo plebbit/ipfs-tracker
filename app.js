@@ -3,7 +3,6 @@ inspect.defaultOptions.depth = null
 
 import express from 'express'
 import path from 'path'
-import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 import { fileURLToPath } from 'url'
 import indexRouter from './routes/index.js'
@@ -28,7 +27,6 @@ app.use(express.json({
   type: (req) => req.method === 'POST' || req.method === 'PUT'
 }))
 // app.use(express.urlencoded({ extended: false }))
-// app.use(cookieParser())
 // app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', indexRouter)

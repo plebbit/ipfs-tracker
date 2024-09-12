@@ -2,7 +2,7 @@
 ```
 git clone https://github.com/plebbit/ipfs-tracker.git && cd ipfs-tracker
 npm install
-DEBUG=ipfs-tracker:* npm start
+DEBUG=ipfs-tracker:* PORT=80 npm start
 ```
 
 #### getting started with docker

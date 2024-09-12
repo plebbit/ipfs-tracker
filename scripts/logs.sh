@@ -17,8 +17,7 @@ if [ -z "${DEPLOY_USER+xxx}" ]; then echo "DEPLOY_USER not set" && exit; fi
 if [ -z "${DEPLOY_PASSWORD+xxx}" ]; then echo "DEPLOY_PASSWORD not set" && exit; fi
 
 SCRIPT="
-cd /home/plebbit-ipni
-docker-compose logs --follow --tail 100
+docker logs --follow -n 100 ipfs-tracker
 "
 
 # execute script over ssh

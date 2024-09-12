@@ -18,12 +18,28 @@ if [ -z "${DEPLOY_PASSWORD+xxx}" ]; then echo "DEPLOY_PASSWORD not set" && exit;
 
 SCRIPT="
 cd /home
-git clone https://github.com/plebbit/plebbit-ipni.git
-cd plebbit-ipni
+git clone https://github.com/plebbit/ipfs-tracker.git
+cd ipfs-tracker
+git reset HEAD --hard
 git pull
-docker-compose down
-docker-compose up
 "
 
 # execute script over ssh
+echo "$SCRIPT" | sshpass -p "$DEPLOY_PASSWORD" ssh "$DEPLOY_USER"@"$DEPLOY_HOST"
+
+# copy files
+FILE_NAMES=(
+  .env
+)
+
+# copy files
+for FILE_NAME in ${FILE_NAMES[@]}; do
+  sshpass -p "$DEPLOY_PASSWORD" scp $FILE_NAME "$DEPLOY_USER"@"$DEPLOY_HOST":/home/ipfs-tracker
+done
+
+SCRIPT="
+cd /home/ipfs-tracker
+scripts/start-docker.sh
+"
+
 echo "$SCRIPT" | sshpass -p "$DEPLOY_PASSWORD" ssh "$DEPLOY_USER"@"$DEPLOY_HOST"

@@ -4,6 +4,8 @@ import { expect } from 'chai'
 // to restore mocks
 const DateNow = Date.now
 
+const cid = 'bafkreigur6gzxm3ykiol7ywou3iy3obruzs2q7boizj7oznznid34dzc3e'
+
 describe('database', () => {
   before(() => {
     database.memory()
@@ -19,7 +21,6 @@ describe('database', () => {
     })
 
     it('addCidProvidersToDatabase concurrent calls should not miss providers', async () => {
-      const cid = 'cid1'
       const providers1 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '1', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
       const providers2 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '2', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
       const providers3 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '3', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
@@ -45,7 +46,6 @@ describe('database', () => {
     })
 
     it('addCidProvidersToDatabase should remove expired', async () => {
-      const cid = 'cid1'
       const providers1 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '1', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
       const providers2 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '2', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
       
@@ -68,7 +68,6 @@ describe('database', () => {
 
   describe('getProviders', () => {
     describe('large amount of providers in db', () => {
-      const cid = 'cid1'
       let res
       before(async () => {
         let count = 200
@@ -89,7 +88,6 @@ describe('database', () => {
   })
 
   describe('expired providers in db', () => {
-    const cid = 'cid1'
     const providers1 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '1', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
     const providers2 = [{Schema: 'bitswap', Protocol: 'transport-bitswap', Payload: {ID: '2', Addrs: ['/ip4/0.0.0.0/tcp/4001']}}]
     let res

@@ -2,6 +2,8 @@ import database from '../lib/database.js'
 import {cleanAddrs} from '../lib/utils.js'
 import express from 'express'
 const router = express.Router()
+import Debug from 'debug'
+const debug = Debug('ipfs-tracker:routes:providers')
 
 router.put('/', async (req, res, next) => {
   // TODO: don't let people add ip addresses that aren't theirs, or peers without any Addrs, or private ips Addrs
@@ -18,6 +20,10 @@ router.put('/', async (req, res, next) => {
     if (provider.Payload.Addrs.length) {
       providers.push(provider)
     }
+  }
+
+  if (!providers.length) {
+    debug('no providers with valid addresses')
   }
 
   await database.addProviders(providers)

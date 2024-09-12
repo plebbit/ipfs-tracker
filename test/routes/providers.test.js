@@ -120,6 +120,8 @@ describe('routes providers', () => {
     })
   })
 
+  // TODO: no addrs doesnt add the provider
+
   describe('GET /routing/v1/providers/ has providers', () => {
     let res
     before(async () => {

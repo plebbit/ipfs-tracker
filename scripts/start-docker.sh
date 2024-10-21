@@ -3,7 +3,6 @@ cd "$root_path"
 
 docker rm -f ipfs-tracker 2>/dev/null
 
-# 4001 is the ipfs p2p port
 docker run \
   --detach \
   --volume=$(pwd):/usr/src/ipfs-tracker \

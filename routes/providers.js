@@ -4,8 +4,11 @@ import express from 'express'
 const router = express.Router()
 import Debug from 'debug'
 const debug = Debug('ipfs-tracker:routes:providers')
+import prometheus from '../lib/prometheus.js'
 
 router.put('/', async (req, res, next) => {
+  prometheus.postProviders()
+
   // TODO: don't let people add ip addresses that aren't theirs, or peers without any Addrs, or private ips Addrs
   /* TODO: once the POST spec is finalized, add interval and min interval to response, and remove peers after this time
     The Pirate Bay: Often uses an announce interval of 1800 seconds (30 minutes).
@@ -21,6 +24,8 @@ router.put('/', async (req, res, next) => {
       providers.push(provider)
     }
   }
+
+  prometheus.postProvidersProviders(providers)
 
   if (!providers.length) {
     debug('no providers with valid addresses')
@@ -39,10 +44,15 @@ router.put('/', async (req, res, next) => {
 
   res.set('Content-Type', 'application/json')
   res.send(resBody)
+  prometheus.postProvidersSuccess()
 })
 
 router.get('/:cid', async (req, res, next) => {
+  prometheus.getProviders()
+
   const {providers, lastModified} = await database.getProviders(req.params.cid)
+
+  prometheus.getProvidersProviders(providers)
 
   const resBody = {Providers: providers}
 
@@ -65,6 +75,7 @@ router.get('/:cid', async (req, res, next) => {
     res.set('Last-Modified', new Date(lastModified).toUTCString())
   }
   res.send(resBody)
+  prometheus.getProvidersSuccess()
 })
 
 export default router

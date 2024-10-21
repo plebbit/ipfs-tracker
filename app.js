@@ -7,6 +7,7 @@ import logger from 'morgan'
 import { fileURLToPath } from 'url'
 import indexRouter from './routes/index.js'
 import providersRouter from './routes/providers.js'
+import prometheusRouter from './routes/prometheus.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import cors from 'cors'
 import Debug from 'debug'
@@ -37,5 +38,6 @@ app.use(express.json({
 
 app.use('/', indexRouter)
 app.use('/routing/v1/providers/', providersRouter)
+app.use('/metrics/prometheus', prometheusRouter)
 
 export default app

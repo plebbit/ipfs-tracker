@@ -3,7 +3,6 @@ cd "$root_path"
 
 docker rm -f ipfs-tracker 2>/dev/null
 
-# listen on 8000 and 80 ports because sometimes 80 doesn't work
 # 4001 is the ipfs p2p port
 docker run \
   --detach \

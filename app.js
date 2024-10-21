@@ -36,12 +36,13 @@ app.use(express.json({
 // app.use(express.urlencoded({ extended: false }))
 // app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', indexRouter)
-app.use('/routing/v1/providers/', providersRouter)
-
 // metrics
 app.use('/metrics/prometheus', prometheusRouter)
 // needed for when used in the plebbit provider because it only proxies /routing/v1/providers/
 app.use('/routing/v1/providers/metrics/prometheus', prometheusRouter)
+
+// routes
+app.use('/', indexRouter)
+app.use('/routing/v1/providers/', providersRouter)
 
 export default app

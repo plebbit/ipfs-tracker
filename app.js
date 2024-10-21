@@ -38,6 +38,10 @@ app.use(express.json({
 
 app.use('/', indexRouter)
 app.use('/routing/v1/providers/', providersRouter)
+
+// metrics
 app.use('/metrics/prometheus', prometheusRouter)
+// needed for when used in the plebbit provider because it only proxies /routing/v1/providers/
+app.use('/routing/v1/providers/metrics/prometheus', prometheusRouter)
 
 export default app

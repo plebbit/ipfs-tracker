@@ -21,7 +21,7 @@ app.use((req, res, next) => {
   next()
 })
 
-// trust x-forwarded-for, the app will almost always use a proxu
+// trust x-forwarded-for, the app will almost always use a proxy
 app.set('trust proxy', true)
 
 app.use(cors())

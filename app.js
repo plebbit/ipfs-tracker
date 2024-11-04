@@ -26,7 +26,8 @@ app.set('trust proxy', true)
 
 app.use(cors())
 if (debug.enabled) {
-  app.use(logger('dev'))
+  // app.use(logger('dev'))
+  app.use(logger(':remote-addr :remote-user :user-agent :method :url :status :response-time ms - :res[content-length]'))
 }
 app.use(express.json({
   limit: '1mb',

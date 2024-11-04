@@ -8,6 +8,7 @@ import prometheus from '../lib/prometheus.js'
 
 router.put('/', async (req, res, next) => {
   prometheus.postProviders()
+  console.log(req.body)
 
   // TODO: don't let people add ip addresses that aren't theirs, or peers without any Addrs, or private ips Addrs
   /* TODO: once the POST spec is finalized, add interval and min interval to response, and remove peers after this time

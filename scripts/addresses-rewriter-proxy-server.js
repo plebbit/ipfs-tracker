@@ -74,17 +74,20 @@ class AddressesRewriterProxyServer {
       if (!this.plebbitOptions.ipfsHttpClientsOptions?.length) {
         throw Error('no plebbitOptions.ipfsHttpClientsOptions')
       }
+      let newAddresses = []
       for (const ipfsHttpClientOptions of this.plebbitOptions.ipfsHttpClientsOptions) {
         const kuboApiUrl = ipfsHttpClientOptions.url || ipfsHttpClientOptions
         try {
           const res = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
-          this.addresses = res.Strings
+          newAddresses = [...newAddresses, ...res.Strings]
         }
         catch (e) {
           debug('tryUpdateAddrs error:', e.message)
         }
       }
-
+      if (newAddresses.length) {
+        this.addresses = newAddresses
+      }
     }
     tryUpdateAddrs()
     setInterval(tryUpdateAddrs, 1000 * 60)

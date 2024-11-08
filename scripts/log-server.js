@@ -3,7 +3,7 @@ import { inspect } from 'node:util'
 inspect.defaultOptions.depth = null
 
 const hostname = '127.0.0.1'
-const port = 8888
+const port = 8889
 
 const server = http.createServer((req, res) => {
   let reqBody = ''

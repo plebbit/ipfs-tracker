@@ -6,7 +6,7 @@ const debug = Debug('plebbit-js:addresses-rewriter')
 
 class AddressesRewriterProxyServer {
   constructor({plebbitOptions, port, hostname, proxyTargetUrl}) {
-    this.addresses = []
+    this.addresses = {}
     this.plebbitOptions = plebbitOptions
     this.port = port
     this.hostname = hostname || '127.0.0.1'
@@ -33,7 +33,10 @@ class AddressesRewriterProxyServer {
         try {
           const json = JSON.parse(rewrittenBody)
           for (const provider of json.Providers) {
-            provider.Payload.Addrs = this.addresses
+            const peerId = provider.Payload.ID
+            if (this.addresses[peerId]) {
+              provider.Payload.Addrs = this.addresses[peerId]
+            }
           }
           rewrittenBody = JSON.stringify(json)
         }
@@ -70,24 +73,24 @@ class AddressesRewriterProxyServer {
 
   // get up to date listen addresses from kubo every x minutes
   _startUpdateAddressesLoop() {
-    const tryUpdateAddrs = async () => {
+    const tryUpdateAddresses = async () => {
       if (!this.plebbitOptions.ipfsHttpClientsOptions?.length) {
         throw Error('no plebbitOptions.ipfsHttpClientsOptions')
       }
-
-      // only works with 1 kubo client
-      const ipfsHttpClientOptions = this.plebbitOptions.ipfsHttpClientsOptions[0]
-      const kuboApiUrl = ipfsHttpClientOptions.url || ipfsHttpClientOptions
-      try {
-        const res = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
-        this.addresses = res.Strings
-      }
-      catch (e) {
-        debug('tryUpdateAddrs error:', e.message)
-      }
+      for (const ipfsHttpClientOptions of this.plebbitOptions.ipfsHttpClientsOptions) {
+        const kuboApiUrl = ipfsHttpClientOptions.url || ipfsHttpClientOptions
+        try {
+          const {ID: peerId} = await fetch(`${kuboApiUrl}/id`, {method: 'POST'}).then(res => res.json())
+          const res = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
+          this.addresses[peerId] = res.Strings
+        }
+        catch (e) {
+          debug('tryUpdateAddresses error:', e.message, {kuboApiUrl})
+        }
+      }      
     }
-    tryUpdateAddrs()
-    setInterval(tryUpdateAddrs, 1000 * 60)
+    tryUpdateAddresses()
+    setInterval(tryUpdateAddresses, 1000 * 60)
   }
 }
 
@@ -96,6 +99,7 @@ const addressesRewriterProxyServer = new AddressesRewriterProxyServer({
   plebbitOptions: {ipfsHttpClientsOptions: ['http://127.0.0.1:5001/api/v0']},
   port: 8888,
   proxyTargetUrl: 'https://peers.pleb.bot',
+  // proxyTargetUrl: 'http://127.0.0.1:8889',
 })
 addressesRewriterProxyServer.listen(() => {
   console.log(`addresses rewriter proxy listening on http://${addressesRewriterProxyServer.hostname}:${addressesRewriterProxyServer.port}`)
@@ -103,29 +107,26 @@ addressesRewriterProxyServer.listen(() => {
 
 /* example of how to use in plebbit-js
 
+const httpRouterProxyUrls = []
 if (isNodeJs && plebbitOptions.ipfsHttpClientsOptions?.length && plebbitOptions.httpRoutersOptions?.length) {
-  let proxyServerPort = 49622
-  for (const [i] of plebbitOptions.httpRoutersOptions.entries()) {
+  let addressesRewriterStartPort = 19575 // use port 19575 as first port, looks like IPRTR (IPFS ROUTER)
+  for (const httpRoutersOptions of plebbitOptions.httpRoutersOptions) {
     // launch the proxy server
-    const port = proxyServerPort++
+    const port = addressesRewriterStartPort++
     const hostname = '127.0.0.1'
     const addressesRewriterProxyServer = new AddressesRewriterProxyServer({
       plebbitOptions: plebbitOptions,
       port, 
       hostname,
-      proxyTargetUrl: 'http://127.0.0.1:8889',
+      proxyTargetUrl: httpRoutersOptions.url || httpRoutersOptions,
     })
     addressesRewriterProxyServer.listen()
 
-    // change the url of the router
-    if (plebbitOptions.httpRoutersOptions[i].url) {
-      plebbitOptions.httpRoutersOptions[i].url = `http://${hostname}:${port}`
-    }
-    else {
-      plebbitOptions.httpRoutersOptions[i] = `http://${hostname}:${port}`
-    }
+    // save the proxy urls to use them later
+    httpRouterProxyUrls.push(`http://${hostname}:${port}`)
   }
 
   // set kubo to the new routers with the proxy urls
+  setKuboHttpRouterUrls(httpRouterProxyUrls)
 }
 */

@@ -74,19 +74,16 @@ class AddressesRewriterProxyServer {
       if (!this.plebbitOptions.ipfsHttpClientsOptions?.length) {
         throw Error('no plebbitOptions.ipfsHttpClientsOptions')
       }
-      let newAddresses = []
-      for (const ipfsHttpClientOptions of this.plebbitOptions.ipfsHttpClientsOptions) {
-        const kuboApiUrl = ipfsHttpClientOptions.url || ipfsHttpClientOptions
-        try {
-          const res = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
-          newAddresses = [...newAddresses, ...res.Strings]
-        }
-        catch (e) {
-          debug('tryUpdateAddrs error:', e.message)
-        }
+
+      // only works with 1 kubo client
+      const ipfsHttpClientOptions = this.plebbitOptions.ipfsHttpClientsOptions[0]
+      const kuboApiUrl = ipfsHttpClientOptions.url || ipfsHttpClientOptions
+      try {
+        const res = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
+        this.addresses = res.Strings
       }
-      if (newAddresses.length) {
-        this.addresses = newAddresses
+      catch (e) {
+        debug('tryUpdateAddrs error:', e.message)
       }
     }
     tryUpdateAddrs()
@@ -98,7 +95,7 @@ class AddressesRewriterProxyServer {
 const addressesRewriterProxyServer = new AddressesRewriterProxyServer({
   plebbitOptions: {ipfsHttpClientsOptions: ['http://127.0.0.1:5001/api/v0']},
   port: 8888,
-  proxyTargetUrl: 'http://127.0.0.1:8889',
+  proxyTargetUrl: 'https://peers.pleb.bot',
 })
 addressesRewriterProxyServer.listen(() => {
   console.log(`addresses rewriter proxy listening on http://${addressesRewriterProxyServer.hostname}:${addressesRewriterProxyServer.port}`)

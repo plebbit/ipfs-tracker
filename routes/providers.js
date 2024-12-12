@@ -45,6 +45,7 @@ router.put('/', async (req, res, next) => {
 
   res.set('Content-Type', 'application/json')
   res.send(resBody)
+
   prometheus.postProvidersSuccess()
 })
 
@@ -55,7 +56,14 @@ router.get('/:cid', async (req, res, next) => {
 
   prometheus.getProvidersProviders(providers)
 
-  const resBody = {Providers: providers}
+  const resBody = JSON.stringify({Providers: providers})
+  let resStatus = 200
+  const resHeaders = {
+    // TODO: add support for application/x-ndjson (streaming)
+    'Content-Type': 'application/json',
+    'Vary': 'Accept',
+    'Content-Length': Buffer.byteLength(resBody)
+  }
 
   // cache-control
   // if server is down, serve cached providers for 24h
@@ -65,17 +73,18 @@ router.get('/:cid', async (req, res, next) => {
   // 10 seconds if no results
   if (!providers.length) {
     maxAge = 10
-    res.status(404)
+    resStatus = 404
   }
-  res.set('Cache-Control', `public, max-age=${maxAge}, public, stale-if-error=${staleIfError}`)
+  resHeaders['Cache-Control'] = `public, max-age=${maxAge}, public, stale-if-error=${staleIfError}`
 
-  // TODO: add support for application/x-ndjson (streaming)
-  res.set('Content-Type', 'application/json')
-  res.set('Vary', 'Accept')
   if (lastModified) {
-    res.set('Last-Modified', new Date(lastModified).toUTCString())
+    resHeaders['Last-Modified'] = new Date(lastModified).toUTCString()
   }
-  res.send(resBody)
+
+  // use res.writeHead() instead of res.set() to force remove content-type charset=utf-8 
+  res.writeHead(resStatus, resHeaders)
+  res.end(resBody)
+
   prometheus.getProvidersSuccess()
 })
 

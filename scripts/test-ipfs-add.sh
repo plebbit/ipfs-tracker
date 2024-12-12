@@ -1,6 +1,6 @@
 # add to ipfs and provide
 cid=$(date | IPFS_PATH=.ipfs ./ipfs add --quieter --pin=false)
-cid=$(date | IPFS_PATH=.ipfs ./ipfs cid base32 $cid)
+cid=$(IPFS_PATH=.ipfs ./ipfs cid base32 $cid)
 IPFS_PATH=.ipfs ./ipfs pin add $cid
 
 # remove from ipfs and fetch providers

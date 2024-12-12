@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "start": "nodemon",
     "dev": "nodemon",
     "test": "mocha ./test/**/*",
     "test:watch": "mocha --parallel --watch ./test/**/*",

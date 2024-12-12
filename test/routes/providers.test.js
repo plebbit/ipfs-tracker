@@ -89,7 +89,7 @@ describe('routes providers', () => {
     let res
     const badIps = [
       // local ips
-      `/ip4/0.0.0.0/tcp/4001`,
+      `/ip4/192.168.0.1/tcp/4001`,
       `/ip4/127.0.0.1/tcp/4001`,
       // public but different from req.iq
       `/ip4/8.8.8.8/tcp/4001`,
@@ -113,6 +113,7 @@ describe('routes providers', () => {
       const {providers} = await database.getProviders(body.Providers[0].Payload.Keys[0])
       expect(providers.length).to.equal(1)
       expect(providers[0].Addrs.length).to.be.greaterThan(0)
+      // TODO: uncomment this after we no longer transform 0.0.0.0 into req.ip
       expect(providers[0].Addrs.length).to.equal(body.Providers[0].Payload.Addrs.length)
       for (const badIp of badIps) {
         expect(providers[0].Addrs.includes(badIp)).to.equal(false)
@@ -198,7 +199,7 @@ describe('routes providers', () => {
       expect(res.headers['content-type'].includes('json')).to.equal(true)
     })
     it('should contain no providers', async () => {
-      expect(res.body.Providers.length).to.equal(0)
+      expect(res.body.Providers).to.equal(null)
     })
   })
 })

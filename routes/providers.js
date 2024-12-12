@@ -75,7 +75,7 @@ router.get('/:cid', async (req, res, next) => {
     maxAge = 10
     resStatus = 404
   }
-  resHeaders['Cache-Control'] = `public, max-age=${maxAge}, public, stale-if-error=${staleIfError}`
+  // resHeaders['Cache-Control'] = `public, max-age=${maxAge}, public, stale-if-error=${staleIfError}`
 
   if (lastModified) {
     resHeaders['Last-Modified'] = new Date(lastModified).toUTCString()

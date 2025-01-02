@@ -11,7 +11,7 @@ class AddressesRewriterProxyServer {
     this.port = port
     this.hostname = hostname || '127.0.0.1'
     this.proxyTarget = parseUrl(proxyTargetUrl)
-    this.server = this.server = http.createServer((req, res) => this._proxyRequestRewrite(req, res))
+    this.server = http.createServer((req, res) => this._proxyRequestRewrite(req, res))
   }
 
   listen(callback) {
@@ -54,7 +54,9 @@ class AddressesRewriterProxyServer {
         method: req.method,
         headers: {
           ...req.headers,
-          'Content-Length': Buffer.byteLength(rewrittenBody)
+          'Content-Length': Buffer.byteLength(rewrittenBody),
+          'content-length': Buffer.byteLength(rewrittenBody),
+          host: this.proxyTarget.host
         }
       }
       const proxyReq = httpRequest(requestOptions, (proxyRes) => {
@@ -80,9 +82,11 @@ class AddressesRewriterProxyServer {
       for (const ipfsHttpClientOptions of this.plebbitOptions.ipfsHttpClientsOptions) {
         const kuboApiUrl = ipfsHttpClientOptions.url || ipfsHttpClientOptions
         try {
-          const {ID: peerId} = await fetch(`${kuboApiUrl}/id`, {method: 'POST'}).then(res => res.json())
-          const res = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
-          this.addresses[peerId] = res.Strings
+          const idRes = await fetch(`${kuboApiUrl}/id`, {method: 'POST'}).then(res => res.json())
+          const peerId = idRes.ID
+          const swarmRes = await fetch(`${kuboApiUrl}/swarm/addrs/listen`, {method: 'POST'}).then(res => res.json())
+          // merge id and swarm addresses to make sure no addresses are missing
+          this.addresses[peerId] = [...new Set([...swarmRes.Strings, ...idRes.Addresses])]
         }
         catch (e) {
           debug('tryUpdateAddresses error:', e.message, {kuboApiUrl})

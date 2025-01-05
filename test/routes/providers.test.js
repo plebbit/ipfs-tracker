@@ -81,6 +81,7 @@ describe('routes providers', () => {
     })
     it('database should have provider', async () => {
       const {providers} = await database.getProviders(body.Providers[0].Payload.Keys[0])
+      console.log(providers)
       expect(providers.length).to.equal(1)
     })
   })

@@ -4,7 +4,7 @@ import { expect } from 'chai'
 // to restore mocks
 const DateNow = Date.now
 
-const cid = 'bafkreigur6gzxm3ykiol7ywou3iy3obruzs2q7boizj7oznznid34dzc3e'
+const cid = 'bafybeiczorqqam64xocjjjq2vg7eixz6deyex5xbzehuurj45626rtljga'
 
 describe('database', () => {
   before(() => {

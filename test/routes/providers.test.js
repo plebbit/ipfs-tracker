@@ -203,4 +203,67 @@ describe('routes providers', () => {
       expect(res.body.Providers).to.equal(null)
     })
   })
+
+  describe('PUT /routing/v1/providers/ dag-pb codec, GET /routing/v1/providers/ raw codec', () => {
+    const dagPbCodecCid = 'QmSf6sTLvGrCzpLcqdRLy8xUmLUhgdyAQi1VaFy7Aa2VHW'
+    const rawCodecCid = 'bafkreicafdegmgvhbsc4z4whwcz3wjdoeu3jpcuy2mfckqtq5dikjelzau'
+    const body = {
+      Providers: [
+        {
+          Schema: 'bitswap',
+          Protocol: 'transport-bitswap',
+          Signature: 'mx5kamm5kzxuCnVJtX3K9DEj8gKlFqXil2x/M8zDTozvzowTY6W+HOALQ2LCkTZCEz4H5qizpnHxPM/rVQ7MNBg',
+          Payload: {
+            Keys: [dagPbCodecCid],
+            Timestamp: 1725833163372,
+            AdvisoryTTL: 86400000000000,
+            ID: '12D3KooWEdCRaQTjjgbtBoSMhnguznp7GHhsin8eRDEtgEso6Z1B',
+            Addrs: [
+              `/ip4/${mockIp}/tcp/4001`,
+              `/ip4/${mockIp}/udp/4001/quic-v1`,
+              `/ip4/${mockIp}/udp/4001/quic-v1/webtransport`,
+            ]
+          }
+        }
+      ]
+    }
+    let dagPbCodecCidRes, rawCodecCidRes
+    before(async () => {
+      await request(app)
+        .put('/routing/v1/providers/')
+        .set(getHeaders(body))
+        .send(body)
+      dagPbCodecCidRes = await request(app)
+        .get(`/routing/v1/providers/${dagPbCodecCid}`)
+        .set(getHeaders())
+      rawCodecCidRes = await request(app)
+        .get(`/routing/v1/providers/${rawCodecCid}`)
+        .set(getHeaders())
+    })
+    after(() => {
+      database.clear()
+    })
+    it('database should have provider for dag-pb codec cid', async () => {
+      const {providers} = await database.getProviders(dagPbCodecCid)
+      expect(providers.length).to.equal(1)
+    })
+    it('dag-pb codec cid res should have provider', async () => {
+      expect(dagPbCodecCidRes.status).to.equal(200)
+      expect(dagPbCodecCidRes.body.Providers[0].Schema).to.equal('peer')
+      expect(dagPbCodecCidRes.body.Providers[0].ID).to.equal(body.Providers[0].Payload.ID)
+      expect(dagPbCodecCidRes.body.Providers[0].Protocols[0]).to.equal(body.Providers[0].Protocol)
+      expect(dagPbCodecCidRes.body.Providers[0].Addrs).to.deep.equal(body.Providers[0].Payload.Addrs)
+    })
+    it('database should have provider for raw codec cid', async () => {
+      const {providers} = await database.getProviders(rawCodecCid)
+      expect(providers.length).to.equal(1)
+    })
+    it('raw codec cid res should have provider', async () => {
+      expect(rawCodecCidRes.status).to.equal(200)
+      expect(rawCodecCidRes.body.Providers[0].Schema).to.equal('peer')
+      expect(rawCodecCidRes.body.Providers[0].ID).to.equal(body.Providers[0].Payload.ID)
+      expect(rawCodecCidRes.body.Providers[0].Protocols[0]).to.equal(body.Providers[0].Protocol)
+      expect(rawCodecCidRes.body.Providers[0].Addrs).to.deep.equal(body.Providers[0].Payload.Addrs)
+    })
+  })
 })

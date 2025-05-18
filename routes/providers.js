@@ -1,5 +1,5 @@
 import database from '../lib/database.js'
-import {cleanAddrs} from '../lib/utils.js'
+import {cleanAddrs, logPostProviders} from '../lib/utils.js'
 import express from 'express'
 const router = express.Router()
 import Debug from 'debug'
@@ -8,6 +8,7 @@ import prometheus from '../lib/prometheus.js'
 
 router.put('/', async (req, res, next) => {
   prometheus.postProviders()
+  logPostProviders(req)
 
   // TODO: don't let people add ip addresses that aren't theirs, or peers without any Addrs, or private ips Addrs
   /* TODO: once the POST spec is finalized, add interval and min interval to response, and remove peers after this time

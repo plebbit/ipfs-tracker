@@ -1,10 +1,10 @@
-import { inspect } from 'node:util'
+import {inspect} from 'node:util'
 inspect.defaultOptions.depth = null
 
 import express from 'express'
 import path from 'path'
 import logger from 'morgan'
-import { fileURLToPath } from 'url'
+import {fileURLToPath} from 'url'
 import indexRouter from './routes/index.js'
 import providersRouter from './routes/providers.js'
 import prometheusRouter from './routes/prometheus.js'
@@ -12,6 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import cors from 'cors'
 import Debug from 'debug'
 const debug = Debug('ipfs-tracker:server')
+const logKey = process.argv.includes('--log-key') && process.argv[process.argv.indexOf('--log-key') + 1]
 
 const app = express()
 
@@ -34,6 +35,7 @@ app.use(express.json({
   // TODO: kubo doesn't always include content-type header, remove after delegated routing spec
   type: (req) => req.method === 'POST' || req.method === 'PUT'
 }))
+// TODO: figure out why did I comment this out?
 // app.use(express.urlencoded({ extended: false }))
 // app.use(express.static(path.join(__dirname, 'public')))
 
@@ -45,5 +47,10 @@ app.use('/routing/v1/providers/metrics/prometheus', prometheusRouter)
 // routes
 app.use('/', indexRouter)
 app.use('/routing/v1/providers/', providersRouter)
+
+// logs
+if (logKey) {
+  app.use('/log', express.static(path.join(__dirname, 'log')))
+}
 
 export default app

@@ -39,7 +39,7 @@ done
 
 SCRIPT="
 cd /home/ipfs-tracker
-scripts/start-docker.sh
+LOG_KEY=$LOG_KEY scripts/start-docker.sh
 "
 
 echo "$SCRIPT" | sshpass -p "$DEPLOY_PASSWORD" ssh "$DEPLOY_USER"@"$DEPLOY_HOST"

@@ -50,6 +50,7 @@ app.use('/routing/v1/providers/', providersRouter)
 
 // logs
 if (logKey) {
+  console.log({logKey})
   app.use('/log', express.static(path.join(__dirname, 'log')))
 }
 

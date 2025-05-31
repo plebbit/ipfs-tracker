@@ -81,6 +81,9 @@ const startIpfs = async () => {
   await spawnAsync(ipfsPath, ['config', '--json', 'Routing.Routers', JSON.stringify(httpRoutersConfig)], {env, hideWindows: true})
   await spawnAsync(ipfsPath, ['config', '--json', 'Routing.Methods', JSON.stringify(httpRoutersMethodsConfig)], {env, hideWindows: true})
 
+  // set short reprovide interval to test reproviding
+  await spawnAsync(ipfsPath, ['config', 'Reprovider.Interval', '1m'], {env, hideWindows: true})
+
   await new Promise((resolve, reject) => {
     const ipfsProcess = spawn(ipfsPath, ['daemon', '--migrate', '--enable-namesys-pubsub'], {env, hideWindows: true})
     console.log(`ipfs daemon process started with pid ${ipfsProcess.pid}`)

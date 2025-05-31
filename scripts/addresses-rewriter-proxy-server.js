@@ -2,7 +2,12 @@ import http from 'node:http'
 import https from 'node:https'
 import {parse as parseUrl} from 'url'
 import Debug from 'debug'
-const debug = Debug('plebbit-js:addresses-rewriter')
+
+// debug
+// const debug = Debug('plebbit-js:addresses-rewriter')
+const debug = console.log
+import {inspect} from 'node:util'
+inspect.defaultOptions.depth = null
 
 class AddressesRewriterProxyServer {
   constructor({plebbitOptions, port, hostname, proxyTargetUrl}) {
@@ -29,16 +34,17 @@ class AddressesRewriterProxyServer {
 
       // rewrite body with up to date addresses
       let rewrittenBody = reqBody
+      let rewrittenBodyJson
       if (rewrittenBody) {
         try {
-          const json = JSON.parse(rewrittenBody)
-          for (const provider of json.Providers) {
+          rewrittenBodyJson = JSON.parse(rewrittenBody)
+          for (const provider of rewrittenBodyJson.Providers) {
             const peerId = provider.Payload.ID
             if (this.addresses[peerId]) {
               provider.Payload.Addrs = this.addresses[peerId]
             }
           }
-          rewrittenBody = JSON.stringify(json)
+          rewrittenBody = JSON.stringify(rewrittenBodyJson)
         }
         catch (e) {
           debug('proxy body rewrite error:', e.message)
@@ -68,6 +74,7 @@ class AddressesRewriterProxyServer {
         res.writeHead(500)
         res.end('Internal Server Error')
       })
+      debug({method: req.method, url: req.url, headers: req.headers, body: rewrittenBodyJson})
       proxyReq.write(rewrittenBody)
       proxyReq.end()
     })
